@@ -1,13 +1,21 @@
-# Test Neural Networks IO using Flask and Flatbuffers
+# Test Neural Networks IO using gRPC and Protobuffers
+
+## Build Protobuf
 
 ``` sh
-mkdir build && cd build
-cmake ../ext/flatbuffers
-make flatc -j8
-cd ..
-# generate messages for python
-./build/flatc -p -o pymsg msg.fbs
+mkdir buildProto && cd buildProto
+cmake ../ext/protobuf -Dprotobuf_BUILD_TESTS=OFF
+make protoc -j8
 ```
+
+Generate messages:
+
+``` sh
+mkdir cppMsg && mkdir pyMsg
+./buildProto/protoc --proto_path=. --cpp_out=cppMsg --python_out=pyMsg msg.proto
+```
+
+## Build
 
 
 [Install gRPC](https://github.com/grpc/grpc/blob/v1.55.0/src/cpp/README.md).
@@ -26,3 +34,4 @@ pip install -r requirements.txt
 References:
 
 * [Install gRPC](https://grpc.io/blog/installation/)
+* [Announcing out-of-the-box support for gRPC in the Flatbuffers serialization library](https://grpc.io/blog/grpc-flatbuffers/)
