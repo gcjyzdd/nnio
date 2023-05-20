@@ -1,3 +1,6 @@
 [submodule "ext/flatbuffers"]
 	path = ext/flatbuffers
 	url = https://github.com/google/flatbuffers
+[submodule "ext/grpc"]
+	path = ext/grpc
+	url = https://github.com/grpc/grpc.git
