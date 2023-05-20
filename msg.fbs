@@ -1,0 +1,12 @@
+namespace ywu;
+
+table image{
+    width:int32;
+    height:int32;
+    data:[uint8];
+}
+
+table mask{
+    length:int32;
+    data:[int32];
+}
