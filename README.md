@@ -1,6 +1,6 @@
 # Test Neural Networks IO using gRPC and Protobuffers
 
-## Install vcpkg
+## Install gRPC via vcpkg
 
 ``` sh
 export VCPKG_DIR=$HOME/Documents/vcpkg
@@ -11,9 +11,10 @@ cd vcpkg
 ./vcpkg install grpc
 ```
 
-## Build
+## Build the C++ client
 
 ``` sh
+mkdir cppMsg && mkdir pyMsg
 # generate messages using protoc from vcpkg
 $VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_out=cppMsg \
   --plugin=protoc-gen-grpc=$VCPKG_DIR/installed/x64-linux/tools/grpc/grpc_cpp_plugin \
@@ -39,6 +40,12 @@ python3 -m venv venv
 source venv/bin/activate
 # install packages
 pip install -r requirements.txt
+```
+
+Then copy `pyserver.py` to folder pyMsg and run:
+
+``` sh
+python pyserver.py
 ```
 
 References:
