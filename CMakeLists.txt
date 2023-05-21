@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.22)
 project(my_project)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-# it has to find protobuf first otherwise it won't find grpc
-find_package(Protobuf REQUIRED)
 find_package(gRPC CONFIG REQUIRED)
 
 add_executable(my_exe src/main.cpp
 cppMsg/msg.pb.cc)
-target_link_libraries(my_exe grpc++)
+target_link_libraries(my_exe PUBLIC gRPC::grpc++)
 target_include_directories(my_exe PUBLIC cppMsg)
