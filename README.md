@@ -15,7 +15,14 @@ cd vcpkg
 
 ``` sh
 # generate messages using protoc from vcpkg
-$VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --cpp_out=cppMsg --python_out=pyMsg msg.proto
+$VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_out=cppMsg \
+  --plugin=protoc-gen-grpc=$VCPKG_DIR/installed/x64-linux/tools/grpc/grpc_cpp_plugin \
+  --cpp_out=cppMsg msg.proto
+# generate messages for python
+$VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_python_out=pyMsg \
+  --plugin=protoc-gen-grpc_python=$VCPKG_DIR/installed/x64-linux/tools/grpc/grpc_python_plugin \
+  --python_out=pyMsg msg.proto
+
 mkdir build && cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake ..
 make
