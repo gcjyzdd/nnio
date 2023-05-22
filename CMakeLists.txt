@@ -6,8 +6,6 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 find_package(gRPC CONFIG REQUIRED)
 
-add_executable(my_exe src/main.cpp
-cppMsg/msg.pb.cc
-cppMsg/msg.grpc.pb.cc)
+add_executable(my_exe src/main.cpp cppMsg/msg.pb.cc cppMsg/msg.grpc.pb.cc)
 target_link_libraries(my_exe PUBLIC gRPC::grpc++)
 target_include_directories(my_exe PUBLIC cppMsg)

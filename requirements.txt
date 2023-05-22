@@ -1,4 +1,6 @@
-grpcio
-grpcio-tools
-conan
+grpcio==1.54.2
+grpcio-tools==1.54.2
+conan~=2.0
 autopep8
+cmakelang
+cmake~=3.26
