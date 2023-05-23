@@ -7,6 +7,7 @@ import msg_pb2_grpc
 
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 import cv2
+import numpy as np
 
 model_type = "vit_b"
 
@@ -16,13 +17,30 @@ mask_generator = SamAutomaticMaskGenerator(sam)
 
 class InferenceServer(msg_pb2_grpc.InferenceSamServicer):
     def Inference(self, request: msg_pb2.ImageRequest, context):
-        image = cv2.imread('./dog.jpg')
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # image = cv2.imread('./dog.jpg')
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = np.frombuffer(request.data, dtype=np.uint8).reshape(
+            (request.height, request.width, 3))
+
         logging.info("start inference")
         masks = mask_generator.generate(image)
         logging.info("end inference")
-        logging.info('first pixel %d' % request.data[0])
-        return msg_pb2.MaskReply(length=10)
+        logging.info('w={}, h={}, first pixel {}'.format(
+            request.width, request.height, request.data[0]))
+
+        reply = msg_pb2.MaskReply()
+        reply.w = request.width
+        reply.h = request.height
+        for m in masks:
+            mask = reply.masks.add()
+            mask.area = m['area']
+            mask.bbox.x = m['bbox'][0]
+            mask.bbox.y = m['bbox'][1]
+            mask.bbox.w = m['bbox'][2]
+            mask.bbox.h = m['bbox'][3]
+            # TODO: fill more data
+
+        return reply
 
 
 def serve():
