@@ -6,9 +6,42 @@ message ImageRequest {
   bytes data = 3;
 }
 
-message MaskReply{
+// a dummy test
+message MaskReplyTest{
     int32 length = 1;
     bytes data = 2;
+}
+
+message PointCoord{
+  int32 x=1;
+  int32 y=2;
+}
+
+message Rect{
+  int32 x=1;
+  int32 y=2;
+  int32 w=3;
+  int32 h=4;
+}
+
+message MaskData{
+  repeated bool data = 1;
+  int32 area = 2;
+  Rect bbox = 3;
+  float iou = 4;
+  repeated PointCoord point_coords = 5;
+  float stability_score = 6;
+  Rect crop_box = 7;
+}
+
+message MaskReply{
+  repeated MaskData masks=1;
+  int32 w = 2;
+  int32 h = 3;
+}
+
+service InferenceSamTest {
+  rpc Inference(ImageRequest) returns (MaskReplyTest){}
 }
 
 service InferenceSam {

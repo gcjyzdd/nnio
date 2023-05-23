@@ -2,46 +2,54 @@
 #include "msg.pb.h"
 #include <grpcpp/grpcpp.h>
 #include <iostream>
+#include <stb/stb_image.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
-class InferenceClient {
-public:
-  explicit InferenceClient(std::shared_ptr<Channel> channel)
-      : m_stub(InferenceSam::NewStub(channel)) {}
-
-  MaskReply const &query(std::string const &data) {
-    ImageRequest req;
-    req.set_width(100);
-    req.set_height(100);
-    // assign the image
-    req.set_data(data);
-
-    if (Status status = m_stub->Inference(&m_context, req, &m_reply);
-        !status.ok()) {
-      throw std::invalid_argument(
-          "Cannot inference via gRPC! Check if the server is running.");
+class InferenceClient
+{
+   public:
+    explicit InferenceClient(std::shared_ptr<Channel> channel) : m_stub(InferenceSam::NewStub(channel))
+    {
     }
-    return m_reply;
-  }
 
-private:
-  ClientContext m_context;
-  std::unique_ptr<InferenceSam::Stub> m_stub;
+    MaskReply const &query(int w, int h, std::string data)
+    {
+        ImageRequest req;
+        req.set_width(w);
+        req.set_height(h);
+        // assign the image
+        req.set_data(std::move(data));
 
-  MaskReply m_reply;
+        if (Status status = m_stub->Inference(&m_context, req, &m_reply); !status.ok())
+        {
+            throw std::invalid_argument("Cannot inference via gRPC! Check if the server is running.");
+        }
+        return m_reply;
+    }
+
+   private:
+    ClientContext                       m_context;
+    std::unique_ptr<InferenceSam::Stub> m_stub;
+
+    MaskReply m_reply;
 };
 
-int main() {
-  InferenceClient client(grpc::CreateChannel(
-      "localhost:50051", grpc::InsecureChannelCredentials()));
-  std::string img(3, ' ');
-  img[0] = 0xFF;
-  img[1] = 155U;
-  img[2] = 10U;
-  const auto &result = client.query(img);
-  std::cout << "Mask length = " << result.length() << std::endl;
-  return 0;
+int main()
+{
+    InferenceClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
+
+    int w{};
+    int h{};
+    int c{};
+
+    auto       *data = stbi_load("./dog.jpg", &w, &h, &c, 3);
+    std::string image(reinterpret_cast<const char *>(data), w * h * c);
+
+    const auto &result = client.query(w, h, image);
+    std::cout << "Mask length = " << result.masks_size() << std::endl;
+    stbi_image_free(data);
+    return 0;
 }

@@ -1,4 +1,5 @@
 {
     "sonarlint.pathToCompileCommands": "${workspaceFolder}/build/compile_commands.json",
-    "cmakeFormat.exePath": "venv\\Scripts\\cmake-format"
+    "cmakeFormat.exePath": "venv\\Scripts\\cmake-format",
+    "svn.ignoreMissingSvnWarning": true
 }

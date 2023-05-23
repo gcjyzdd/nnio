@@ -68,7 +68,27 @@ pip install -r requirements.txt
 Then copy `pyserver.py` to folder pyMsg and run:
 
 ``` sh
+ln pyserver.py pyMsg/pyserver.py
+cd pyMsg
 python pyserver.py
+```
+
+## Test with SAM
+
+
+``` sh
+# install pytorch with CPU
+# see https://pytorch.org/get-started/locally/
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+pip install git+https://github.com/facebookresearch/segment-anything.git
+pip install opencv-python pycocotools matplotlib onnxruntime onnx
+```
+
+Download the [ViT-B SAM model](https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth).
+
+``` sh
+ln  pyserverSAM.py pyMsg/pyserverSAM.py
+python pyMsg/pyseverSAM.py
 ```
 
 References:

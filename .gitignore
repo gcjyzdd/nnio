@@ -3,3 +3,6 @@ venv
 pyMsg
 cppMsg
 __pycache__
+*.pth
+*.jpg
+*.log
