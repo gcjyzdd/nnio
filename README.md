@@ -11,6 +11,12 @@ cd vcpkg
 ./vcpkg install grpc
 ```
 
+On Windows, install gRPC:
+
+``` bat
+.\vcpkg install grpc:x64-windows
+```
+
 ## Build the C++ client
 
 ``` sh
@@ -27,6 +33,23 @@ $VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_pytho
 mkdir build && cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake ..
 make
+```
+
+On Windows:
+
+``` bat
+set VCPKG_DIR=C:\sw\vcpkg-2023.04.15
+mkdir cppMsg && mkdir pyMsg
+%VCPKG_DIR%/installed/x64-windows/tools/protobuf/protoc --proto_path=. --grpc_out=cppMsg ^
+  --plugin=protoc-gen-grpc=%VCPKG_DIR%/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe ^
+  --cpp_out=cppMsg msg.proto
+%VCPKG_DIR%/installed/x64-windows/tools/protobuf/protoc --proto_path=. --grpc_python_out=pyMsg ^
+  --plugin=protoc-gen-grpc_python=%VCPKG_DIR%/installed/x64-windows/tools/grpc/grpc_python_plugin.exe ^
+  --python_out=pyMsg msg.proto
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=%VCPKG_DIR%/scripts/buildsystems/vcpkg.cmake ..
+cmake --build . --config Release
+cmake --build . --config Debug
 ```
 
 ## Python Server
