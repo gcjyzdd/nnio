@@ -1,5 +1,75 @@
 # Test Neural Networks IO using gRPC and Protobuffers
 
+Integration of gRPC in python is very straightforward via pip.
+But it becomes tricky to integrate gRPC in a C++ project that works cross-platform.
+Compiling gRPC from source and linking it properly takes a lot of time and there are tons of errors related to CMake and protobuffers.
+
+In this project, there are two ways to build the C++ client: install gRPC via vcpkg or conan.
+The former is very easy to setup and it takes a while (10~30 min) because vcpkg will build gRPC from source.
+The later just downloads binaries from conan-center and you don't need to build the libraries from source.
+So it's fast; but it may take a few minutes to set conan up on your machine.
+
+If you choose to install gRPC via vcpkg, please change version of grpcio and grpcio-tools to `1.54.2` in [requirements.txt](./requirements.txt).
+You have to do that because vcpkg cannot **easily** control the version of libraries.
+In this case, vcpkg always install gRPC v1.54.2 and we have to adapt the python libraries so they could communicate.
+
+Create a virtual python environment for this project since we need some tools:
+
+``` sh
+# create a virtual environment
+python3 -m venv venv
+# activate the environment
+source venv/bin/activate
+# install packages
+pip install -r requirements.txt
+```
+
+## Build the C++ client with conan 1.X
+
+With conan version 1.60, we don't need to use vcpkg to build gRPC which will take a while.
+On windows, the build time could be even longer.
+Even that build only happens once per machine, I still like to avoid it.
+
+If you use conan for the first time, you need to configure it:
+
+``` sh
+# create a default profile
+conan profile new --detect default
+# change cxx abi for gcc
+conan profile update settings.compiler.libcxx=libstdc++11 default
+```
+
+See [the profile of my Linux machine](./profile_gcc_11).
+
+Release build:
+
+``` sh
+# install libraries for your profile using conan
+conan install . --profile ./profile_gcc_11 --install-folder=buildRelease
+# setup protoc and the plugins to generate messages. You may need to change the path based on yours.
+export PROTOC=/home/changjie/.conan/data/protobuf/3.20.0/_/_/package/2dbf65f76c0469903ce48756c39d50cd4e721678/bin/protoc
+export GRPC_BIN_DIR=$HOME/.conan/data/grpc/1.40.0/_/_/package/2fcd67741f0ce04977353aa7a750d8f3b68efb6a/bin/
+mkdir cppMsg && mkdir pyMsg
+# generate messages using protoc from vcpkg
+$PROTOC --proto_path=. --grpc_out=cppMsg \
+  --plugin=protoc-gen-grpc=$GRPC_BIN_DIR/grpc_cpp_plugin \
+  --cpp_out=cppMsg msg.proto
+# generate messages for python
+$PROTOC --proto_path=. --grpc_python_out=pyMsg \
+  --plugin=protoc-gen-grpc_python=$GRPC_BIN_DIR/grpc_python_plugin \
+  --python_out=pyMsg msg.proto
+cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+Debug build:
+
+``` sh
+conan install . --profile ./profile_gcc_11 -s build_type=Debug --install-folder=buildDebug
+cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
+On Windows it should work similarly, except for the profile.
+
 ## Install gRPC via vcpkg
 
 ``` sh
@@ -54,18 +124,7 @@ cmake --build . --config Debug
 
 ## Python Server
 
-Create a virtual python environment:
-
-``` sh
-# create a virtual environment
-python3 -m venv venv
-# activate the environment
-source venv/bin/activate
-# install packages
-pip install -r requirements.txt
-```
-
-Then copy `pyserver.py` to folder pyMsg and run:
+Copy `pyserver.py` to folder pyMsg and run:
 
 ``` sh
 ln pyserver.py pyMsg/pyserver.py

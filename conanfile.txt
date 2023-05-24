@@ -1,0 +1,6 @@
+[requires]
+grpc/1.40.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
