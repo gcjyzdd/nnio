@@ -24,7 +24,16 @@ jobs:
       run: |
         pip install conan==1.60.0
         conan install . -pr:b ./profile_gcc_11 --install-folder=buildRelease
-
+        
+    - name: generate messages
+      run: |
+        mkdir cppMsg && mkdir pyMsg
+        export GRPC_BIN_DIR=/home/runner/.conan/data/grpc/1.40.0/_/_/package/2a9907cb074c570b3e5233e696b4a536f9b22b31/bin
+        export PROTOC=/home/runner/.conan/data/protobuf/3.20.0/_/_/package/3c46b99f1f6ceb18db163abcd9d9d56913b97edc/bin/protoc
+        $PROTOC --proto_path=. --grpc_out=cppMsg \
+          --plugin=protoc-gen-grpc=$GRPC_BIN_DIR/grpc_cpp_plugin \
+          --cpp_out=cppMsg msg.proto
+          
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
