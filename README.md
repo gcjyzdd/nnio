@@ -9,7 +9,7 @@ The former is very easy to setup and it takes a while (10~30 min) because vcpkg 
 The later just downloads binaries from conan-center and you don't need to build the libraries from source.
 So it's fast; but it may take a few minutes to set conan up on your machine.
 
-If you choose to install gRPC via vcpkg, please change version of grpcio and grpcio-tools to `1.54.2` in [requirements.txt](./requirements.txt).
+**NOTE**: If you choose to install gRPC via vcpkg, please change version of grpcio and grpcio-tools to `1.54.2` in [requirements.txt](./requirements.txt).
 You have to do that because vcpkg cannot **easily** control the version of libraries.
 In this case, vcpkg always install gRPC v1.54.2 and we have to adapt the python libraries so they could communicate.
 
@@ -45,7 +45,7 @@ Release build:
 
 ``` sh
 # install libraries for your profile using conan
-conan install . --profile ./profile_gcc_11 --install-folder=buildRelease
+conan install . -pr:b ./profile_gcc_11 --install-folder=buildRelease
 # setup protoc and the plugins to generate messages. You may need to change the path based on yours.
 export PROTOC=/home/changjie/.conan/data/protobuf/3.20.0/_/_/package/2dbf65f76c0469903ce48756c39d50cd4e721678/bin/protoc
 export GRPC_BIN_DIR=$HOME/.conan/data/grpc/1.40.0/_/_/package/2fcd67741f0ce04977353aa7a750d8f3b68efb6a/bin/
@@ -58,19 +58,23 @@ $PROTOC --proto_path=. --grpc_out=cppMsg \
 $PROTOC --proto_path=. --grpc_python_out=pyMsg \
   --plugin=protoc-gen-grpc_python=$GRPC_BIN_DIR/grpc_python_plugin \
   --python_out=pyMsg msg.proto
-cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --preset release -B buildRelease
+cmake --build buildRelease
 ```
 
 Debug build:
 
 ``` sh
-conan install . --profile ./profile_gcc_11 -s build_type=Debug --install-folder=buildDebug
-cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake .. -DCMAKE_BUILD_TYPE=Release
+conan install . -pr:b ./profile_gcc_11 -s build_type=Debug --install-folder=buildDebug
+cmake --preset debug -B buildDebug
+cmake --build buildDebug
 ```
 
 On Windows it should work similarly, except for the profile.
 
-## Install gRPC via vcpkg
+## Build the C++ client with vcpkg
+
+### Install gRPC via vcpkg
 
 ``` sh
 export VCPKG_DIR=$HOME/Documents/vcpkg
@@ -87,7 +91,7 @@ On Windows, install gRPC:
 .\vcpkg install grpc:x64-windows
 ```
 
-## Build the C++ client
+### Build the C++ client with vcpkg
 
 ``` sh
 mkdir cppMsg && mkdir pyMsg
@@ -136,7 +140,7 @@ python pyserver.py
 
 
 ``` sh
-# install pytorch with CPU
+# install pytorch with CPU. Feel free to use a different variant.
 # see https://pytorch.org/get-started/locally/
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 pip install git+https://github.com/facebookresearch/segment-anything.git
