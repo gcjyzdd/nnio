@@ -47,7 +47,7 @@ Release build:
 # install libraries for your profile using conan
 conan install . -pr:b ./profile_gcc_11 --install-folder=buildRelease
 # setup protoc and the plugins to generate messages. You may need to change the path based on yours.
-export PROTOC=/home/changjie/.conan/data/protobuf/3.20.0/_/_/package/2dbf65f76c0469903ce48756c39d50cd4e721678/bin/protoc
+export PROTOC=$HOME/.conan/data/protobuf/3.20.0/_/_/package/2dbf65f76c0469903ce48756c39d50cd4e721678/bin/protoc
 export GRPC_BIN_DIR=$HOME/.conan/data/grpc/1.40.0/_/_/package/2fcd67741f0ce04977353aa7a750d8f3b68efb6a/bin/
 mkdir cppMsg && mkdir pyMsg
 # generate messages using protoc from vcpkg
