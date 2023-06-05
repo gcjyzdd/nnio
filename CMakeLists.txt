@@ -13,8 +13,9 @@ add_custom_target(
   gen_cpp_msg
   COMMAND
     ${Protobuf_PROTOC_EXECUTABLE} --proto_path=${CMAKE_CURRENT_LIST_DIR}
-    --grpc_out=cppMsg --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_PROGRAM}
-    --cpp_out=cppMsg msg.proto
+    --grpc_out=${CMAKE_CURRENT_LIST_DIR}/cppMsg
+    --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_PROGRAM}
+    --cpp_out=${CMAKE_CURRENT_LIST_DIR}/cppMsg msg.proto
   DEPENDS ${CMAKE_CURRENT_LIST_DIR}/msg.proto)
 
 add_custom_target(
