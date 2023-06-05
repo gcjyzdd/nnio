@@ -46,18 +46,6 @@ Release build:
 ``` sh
 # install libraries for your profile using conan
 conan install . -pr:b ./profile_gcc_11 --install-folder=buildRelease
-# setup protoc and the plugins to generate messages. You may need to change the path based on yours.
-export PROTOC=$HOME/.conan/data/protobuf/3.20.0/_/_/package/2dbf65f76c0469903ce48756c39d50cd4e721678/bin/protoc
-export GRPC_BIN_DIR=$HOME/.conan/data/grpc/1.40.0/_/_/package/2fcd67741f0ce04977353aa7a750d8f3b68efb6a/bin/
-mkdir cppMsg && mkdir pyMsg
-# generate messages using protoc from vcpkg
-$PROTOC --proto_path=. --grpc_out=cppMsg \
-  --plugin=protoc-gen-grpc=$GRPC_BIN_DIR/grpc_cpp_plugin \
-  --cpp_out=cppMsg msg.proto
-# generate messages for python
-$PROTOC --proto_path=. --grpc_python_out=pyMsg \
-  --plugin=protoc-gen-grpc_python=$GRPC_BIN_DIR/grpc_python_plugin \
-  --python_out=pyMsg msg.proto
 cmake --preset release -B buildRelease
 cmake --build buildRelease
 ```
@@ -71,60 +59,6 @@ cmake --build buildDebug
 ```
 
 On Windows it should work similarly, except for the profile.
-
-## Build the C++ client with vcpkg
-
-### Install gRPC via vcpkg
-
-``` sh
-export VCPKG_DIR=$HOME/Documents/vcpkg
-cd ~/Documents
-git clone https://github.com/Microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg install grpc
-```
-
-On Windows, install gRPC:
-
-``` bat
-.\vcpkg install grpc:x64-windows
-```
-
-### Build the C++ client with vcpkg
-
-``` sh
-mkdir cppMsg && mkdir pyMsg
-# generate messages using protoc from vcpkg
-$VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_out=cppMsg \
-  --plugin=protoc-gen-grpc=$VCPKG_DIR/installed/x64-linux/tools/grpc/grpc_cpp_plugin \
-  --cpp_out=cppMsg msg.proto
-# generate messages for python
-$VCPKG_DIR/installed/x64-linux/tools/protobuf/protoc --proto_path=. --grpc_python_out=pyMsg \
-  --plugin=protoc-gen-grpc_python=$VCPKG_DIR/installed/x64-linux/tools/grpc/grpc_python_plugin \
-  --python_out=pyMsg msg.proto
-
-mkdir build && cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake ..
-make
-```
-
-On Windows:
-
-``` bat
-set VCPKG_DIR=C:\sw\vcpkg-2023.04.15
-mkdir cppMsg && mkdir pyMsg
-%VCPKG_DIR%/installed/x64-windows/tools/protobuf/protoc --proto_path=. --grpc_out=cppMsg ^
-  --plugin=protoc-gen-grpc=%VCPKG_DIR%/installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe ^
-  --cpp_out=cppMsg msg.proto
-%VCPKG_DIR%/installed/x64-windows/tools/protobuf/protoc --proto_path=. --grpc_python_out=pyMsg ^
-  --plugin=protoc-gen-grpc_python=%VCPKG_DIR%/installed/x64-windows/tools/grpc/grpc_python_plugin.exe ^
-  --python_out=pyMsg msg.proto
-mkdir build && cd build
-cmake -DCMAKE_TOOLCHAIN_FILE=%VCPKG_DIR%/scripts/buildsystems/vcpkg.cmake ..
-cmake --build . --config Release
-cmake --build . --config Debug
-```
 
 ## Python Server
 
