@@ -9,6 +9,8 @@ from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 import cv2
 import numpy as np
 
+MAX_MESSAGE_LENGTH = 64*1024*2014
+
 model_type = "vit_b"
 
 sam = sam_model_registry[model_type](checkpoint="./sam_vit_b_01ec64.pth")
@@ -38,6 +40,12 @@ class InferenceServer(msg_pb2_grpc.InferenceSamServicer):
             mask.bbox.y = m['bbox'][1]
             mask.bbox.w = m['bbox'][2]
             mask.bbox.h = m['bbox'][3]
+
+            # append np.bool_ array
+            for i in range(reply.h):
+                mask.data.extend(
+                    map(lambda x: x is np.bool_(True), m['segmentation'][i]))
+            mask.iou = m['predicted_iou']
             # TODO: fill more data
 
         return reply
@@ -45,7 +53,12 @@ class InferenceServer(msg_pb2_grpc.InferenceSamServicer):
 
 def serve():
     port = '50051'
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    # https://stackoverflow.com/questions/42629047/how-to-increase-message-size-in-grpc-using-python
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=4),
+                         options=[
+        ('grpc.max_send_message_length', MAX_MESSAGE_LENGTH),
+        ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
+    ],)
     msg_pb2_grpc.add_InferenceSamServicer_to_server(InferenceServer(), server)
     rp = '[::]:' + port
     server.add_insecure_port(rp)

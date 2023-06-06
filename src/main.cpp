@@ -39,7 +39,11 @@ class InferenceClient
 
 int main()
 {
-    InferenceClient client(grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials()));
+    grpc::ChannelArguments args{};
+    args.SetMaxReceiveMessageSize(-1);
+    // args.SetInt(GRPC_ARG_MAX_RECEIVE_MESSAGE_LENGTH, 64 * 1024 * 1024);
+
+    InferenceClient client(grpc::CreateCustomChannel("localhost:50051", grpc::InsecureChannelCredentials(), args));
 
     int w{};
     int h{};
