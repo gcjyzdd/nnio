@@ -88,6 +88,12 @@ ln  pyserverSAM.py pyMsg/pyserverSAM.py
 python pyMsg/pyseverSAM.py
 ```
 
+Then start the C++ client:
+
+``` sh
+./buildRelease/bin/sam_client
+```
+
 References:
 
 * [Quickstart C++ gRPC](https://grpc.io/docs/languages/cpp/quickstart/)
