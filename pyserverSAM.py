@@ -46,7 +46,15 @@ class InferenceServer(msg_pb2_grpc.InferenceSamServicer):
                 mask.data.extend(
                     map(lambda x: x is np.bool_(True), m['segmentation'][i]))
             mask.iou = m['predicted_iou']
-            # TODO: fill more data
+            mask.stability_score = m['stability_score']
+            mask.crop_box.x = m['crop_box'][0]
+            mask.crop_box.y = m['crop_box'][1]
+            mask.crop_box.w = m['crop_box'][2]
+            mask.crop_box.h = m['crop_box'][3]
+            for pt in m['point_coords']:
+                pc = mask.point_coords.add()
+                pc.x = pt[0]
+                pc.y = pt[1]
 
         return reply
 

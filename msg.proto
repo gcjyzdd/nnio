@@ -13,8 +13,8 @@ message MaskReplyTest{
 }
 
 message PointCoord{
-  int32 x=1;
-  int32 y=2;
+  float x=1;
+  float y=2;
 }
 
 message Rect{

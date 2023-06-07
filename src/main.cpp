@@ -40,8 +40,8 @@ class InferenceClient
 int main()
 {
     grpc::ChannelArguments args{};
+    // https://github.com/grpc/grpc/blob/master/examples/cpp/keepalive/greeter_callback_client.cc
     args.SetMaxReceiveMessageSize(-1);
-    // args.SetInt(GRPC_ARG_MAX_RECEIVE_MESSAGE_LENGTH, 64 * 1024 * 1024);
 
     InferenceClient client(grpc::CreateCustomChannel("localhost:50051", grpc::InsecureChannelCredentials(), args));
 
